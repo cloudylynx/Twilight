@@ -1,3 +1,6 @@
+# 本地开发模式（生产部署时注释掉此行）
+local_backend: true
+
 # 后台系统配置
 backend:
     name: github
