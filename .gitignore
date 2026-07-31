@@ -1,21 +1,19 @@
-# editor config
-**/.vscode/
 
-# dependencies
-node_modules/
-
-# generated types
 .astro/
-.vercel/
-
 # build output
+# dependencies
 dist/
-
+# editor config
+.envpublic/pio/models/furina/芙宁娜.moc3
+# generated types
 # logs
+node_modules/
 npm-debug.log*
+pnpm-debug.log*
+# private config
+public/pio/models/furina/芙宁娜.8192/texture_00.png
+public/pio/models/furina/芙宁娜.moc3
+.vercel/
+**/.vscode/
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-
-# private config
-.env
