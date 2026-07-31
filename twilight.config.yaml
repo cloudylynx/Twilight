@@ -452,6 +452,7 @@ pio:
     enable: true
     # 模型文件路径
     models:
+        - "/pio/models/furina/model.json"
         - "/pio/models/pio/model.json"
     # 看板娘位置
     position: "right"

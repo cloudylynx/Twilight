@@ -66,7 +66,7 @@ function loadPioAssets() {
     };
 
     // 按顺序加载脚本
-    loadScript("/pio/static/l2d.js", "pio-l2d-script")
+    loadScript("/pio/static/l2d.js?v=2", "pio-l2d-script")
         .then(() => loadScript("/pio/static/pio.js", "pio-main-script"))
         .then(() => {
             // 脚本加载完成后初始化
