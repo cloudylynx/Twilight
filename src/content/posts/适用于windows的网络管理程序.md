@@ -33,13 +33,8 @@ Windows Network Manager 是一个现代化的 Windows 桌面工具，用于实�
 - **单文件 exe** — `dotnet publish -p:PublishSingleFile=true` 打包为独立可执行文件
 
 ---
-
-## 截图
-
-| 亮色主题 | 暗色主题 |
-|:---:|:---:|
-| *(运行截图)* | *(运行截图)* |
-
+## 开源链接
+    https://github.com/cloudylynx/WindowsNetworkManager 
 ---
 
 ## 系统要求
