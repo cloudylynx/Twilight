@@ -32,13 +32,13 @@ site:
     # 时区配置
     timeZone: 8
     # 字体配置
-    font:
+    #font:
         # 示例字体配置 - Zen Maru Gothic
-        "Example - ZenMaruGothic":
+        #"Example - ZenMaruGothic":
             # 字体源 (字体 CSS 链接 | 字体文件路径)
-            src: "https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic&display=swap"
+            #src: "https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic&display=swap"
             # 字体名 (font-family)
-            family: "Zen Maru Gothic"
+            #family: "Zen Maru Gothic"
     # 主题色配置
     themeColor:
         # 主题色的默认色相 (范围从 0 到 360。例如：红色：0，青色：200，蓝绿色：250，粉色：345)
@@ -454,7 +454,7 @@ pio:
     models:
         - "/pio/models/pio/model.json"
     # 看板娘位置
-    position: "left"
+    position: "right"
     # 看板娘宽度
     width: 280
     # 看板娘高度
