@@ -295,7 +295,7 @@ profile:
 # 公告配置
 announcement:
     # 公告标题
-    title: "Announcement"
+    title: "公告"
     # 公告内容
     content: "Welcome to my blog!"
     # 允许用户关闭公告
@@ -449,7 +449,7 @@ musicPlayer:
 # 看板娘配置
 pio:
     # 启用看板娘
-    enable: true
+    enable: false
     # 模型文件路径
     models:
         - "/pio/models/furina/model.json"
