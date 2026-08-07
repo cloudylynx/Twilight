@@ -1,6 +1,7 @@
 ---
 title: GSI 安装使用及电信卡无法通话问题修复
 published: 2026-08-07T14:37:00.000+08:00
+cover: banner.webp
 tags: []
 category: AndroidROM
 draft: false
