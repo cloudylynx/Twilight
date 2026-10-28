@@ -1,0 +1,14 @@
+{
+  // Cloudflare Workers / Pages 部署配置
+  // 由桑多涅添加（2026-10-29）：修复 "Missing entry-point" 部署错误
+  // 背景：Cloudflare 构建命令是 `npx wrangler deploy`，但仓库里没有配置，
+  //       wrangler 不知道部署哪个目录 → 构建成功但部署失败。
+  "name": "twilight",
+  "compatibility_date": "2026-10-28",
+  // Astro 构建产物目录
+  "assets": {
+    "directory": "./dist",
+    // SPA 兜底：未匹配路径回落到 index.html（Twilight 是 SPA 风格导航）
+    "not_found_handling": "single-page-application"
+  }
+}
