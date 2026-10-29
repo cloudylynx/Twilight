@@ -263,7 +263,9 @@
             // ★ 2026-10-29：把 model.json 的 defaultExpression 传进来
             defaultExpression: (config && config.defaultExpression) || null,
             // ★ 2026-10-29：形态参数（每帧强制写回，绕过坏掉的表情系统）
-            poseParams: (config && config.poseParams) || null
+            poseParams: (config && config.poseParams) || null,
+            // ★ 2026-10-30：可切换表情列表（点击循环）
+            switchableExpressions: (config && config.switchableExpressions) || null
         };
 
         // Load the Live2D model via pixi-live2d-display
@@ -412,16 +414,38 @@
         var core = this.model.internalModel.coreModel;
         if (!core || typeof core.setParameterValueById !== 'function') return;
 
-        var pose = this.modelConfig && this.modelConfig.poseParams;
-        if (!pose) return;
-
         try {
-            for (var id in pose) {
-                if (Object.prototype.hasOwnProperty.call(pose, id)) {
-                    core.setParameterValueById(id, pose[id]);
+            // 1. 先维持姿势（站立）
+            var pose = this.modelConfig && this.modelConfig.poseParams;
+            if (pose) {
+                for (var id in pose) {
+                    if (Object.prototype.hasOwnProperty.call(pose, id)) {
+                        core.setParameterValueById(id, pose[id]);
+                    }
+                }
+            }
+            // 2. 再叠加当前表情参数（如果用户点了切换表情）
+            var expr = this.currentExpressionParams;
+            if (expr) {
+                for (var eid in expr) {
+                    if (Object.prototype.hasOwnProperty.call(expr, eid)) {
+                        core.setParameterValueById(eid, expr[eid]);
+                    }
                 }
             }
         } catch (e) { /* 静默 */ }
+    };
+
+    // ★ 2026-10-30 新增：点击切换表情
+    Engine.prototype._cycleExpression = function() {
+        var list = this.modelConfig && this.modelConfig.switchableExpressions;
+        if (!list || list.length === 0) return null;
+        if (this.exprIndex === undefined) this.exprIndex = -1;
+        this.exprIndex = (this.exprIndex + 1) % list.length;
+        var item = list[this.exprIndex];
+        this.currentExpressionParams = item.params || null;
+        console.log('[PioEngine][EXPR] switched to: ' + item.name);
+        return item.name;
     };
 
     Engine.prototype._positionModel = function() {
@@ -516,6 +540,20 @@
         this.model.on("pointerdown", function() {
             self.lastTapTime = Date.now();
         });
+
+        // ★ 2026-10-30 新增：点击 canvas 切换表情
+        // 这个模型没有 motions，_playMotionGroup 是空操作，
+        // 所以改用「点击循环切换表情」给用户反馈。
+        // 注意：pio.js 的 canvas.onclick 会弹对话气泡，我们挂 pointerdown 避免冲突。
+        var canvasEl = this.canvas;
+        if (canvasEl) {
+            canvasEl.addEventListener('pointerdown', function() {
+                var name = self._cycleExpression();
+                if (name) {
+                    console.log('[PioEngine] tap → expression: ' + name);
+                }
+            });
+        }
     };
 
     Engine.prototype._playMotionGroup = function(group) {
