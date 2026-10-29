@@ -365,7 +365,7 @@
         ].join(';');
 
         wrap.innerHTML = [
-            '<div style="margin-bottom:6px;font-size:11px;opacity:.85">看板娘加载中</div>',
+            '<div style="margin-bottom:6px;font-size:11px;opacity:.85">哥伦比娅正在赶来……</div>',
             '<div style="width:70%;height:4px;background:rgba(255,255,255,.2);border-radius:2px;overflow:hidden">',
             '  <div id="pio-loading-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#8b5cf6,#ec4899);transition:width .3s"></div>',
             '</div>',
