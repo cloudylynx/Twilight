@@ -177,6 +177,10 @@
         this.tickerFn = function() {
             if (selfApp.model && selfApp.model.update) {
                 try { selfApp.model.update(selfApp.app.ticker.deltaMS / 1000); } catch(e) {}
+                // ★ 2026-10-29：update() 后强制写回形态参数
+                // 这个模型的 expressionManager 没被创建（model.expression() 是空操作），
+                // 只能每帧手动 setParameterValueById 覆盖 moc3 默认值。
+                selfApp._enforcePose();
             }
         };
         this.app.ticker.add(this.tickerFn);
@@ -252,7 +256,9 @@
             motionMap: motionMap,
             layout: layout,
             // ★ 2026-10-29：把 model.json 的 defaultExpression 传进来
-            defaultExpression: (config && config.defaultExpression) || null
+            defaultExpression: (config && config.defaultExpression) || null,
+            // ★ 2026-10-29：形态参数（每帧强制写回，绕过坏掉的表情系统）
+            poseParams: (config && config.poseParams) || null
         };
 
         // Load the Live2D model via pixi-live2d-display
@@ -391,6 +397,26 @@
             setTimeout(function() { wrap.remove(); }, 350);
             console.log('[PioEngine] loading UI hidden');
         }
+    };
+
+    // ★ 2026-10-29 新增：强制维持形态参数
+    // 少女VTS模型没有可用的 expressionManager，model.expression() 不会改变参数。
+    // 每帧在 model.update() 之后手动写回，才能稳定维持站立形态。
+    Engine.prototype._enforcePose = function() {
+        if (!this.model || !this.model.internalModel) return;
+        var core = this.model.internalModel.coreModel;
+        if (!core || typeof core.setParameterValueById !== 'function') return;
+
+        var pose = this.modelConfig && this.modelConfig.poseParams;
+        if (!pose) return;
+
+        try {
+            for (var id in pose) {
+                if (Object.prototype.hasOwnProperty.call(pose, id)) {
+                    core.setParameterValueById(id, pose[id]);
+                }
+            }
+        } catch (e) { /* 静默 */ }
     };
 
     Engine.prototype._positionModel = function() {
