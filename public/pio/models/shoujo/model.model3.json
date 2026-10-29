@@ -1,7 +1,7 @@
 {
     "Version": 3,
     "FileReferences": {
-        "Moc": "model.moc3",
+        "Moc": "model.moc3.bin",
         "Textures": [
             "textures/texture_00.png",
             "textures/texture_01.png"
