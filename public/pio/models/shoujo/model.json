@@ -28,7 +28,9 @@
     "poseParams": {
         "Param59": 1.0,
         "Param61": 1.0,
-        "Param29": 0.0
+        "Param29": 0.0,
+        "ParamEyeLOpen": 0.0,
+        "ParamEyeROpen": 0.0
     },
     "switchableExpressions": [
         {
