@@ -29,5 +29,74 @@
         "Param59": 1.0,
         "Param61": 1.0,
         "Param29": 0.0
-    }
+    },
+    "switchableExpressions": [
+        {
+            "name": "blush",
+            "params": {
+                "Param39": 1.0
+            }
+        },
+        {
+            "name": "angry",
+            "params": {
+                "Param39": 0.29,
+                "Param45": 1.0
+            }
+        },
+        {
+            "name": "star_eyes",
+            "params": {
+                "Param28": 1.0,
+                "Param51": 1.0
+            }
+        },
+        {
+            "name": "heart_eyes",
+            "params": {
+                "Param28": 1.0,
+                "Param39": 1.0
+            }
+        },
+        {
+            "name": "sunglasses",
+            "params": {
+                "Param44": 1.0
+            }
+        },
+        {
+            "name": "sleep",
+            "params": {
+                "Param37": 1.0,
+                "ParamEyeLOpen": 0.0
+            }
+        },
+        {
+            "name": "wink",
+            "params": {
+                "Param28": 1.0,
+                "Param49": 1.0
+            }
+        },
+        {
+            "name": "squint_smile",
+            "params": {
+                "Param28": 1.0,
+                "Param52": 1.0
+            }
+        },
+        {
+            "name": "normal",
+            "params": {
+                "Param28": 0.0,
+                "Param39": 0.0,
+                "Param44": 0.0,
+                "Param37": 0.0,
+                "Param45": 0.0,
+                "Param49": 0.0,
+                "Param51": 0.0,
+                "Param52": 0.0
+            }
+        }
+    ]
 }
