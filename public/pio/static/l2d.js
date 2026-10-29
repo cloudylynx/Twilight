@@ -151,15 +151,37 @@
         canvas.width = w;
         canvas.height = h;
 
+        // ★ 2026-10-29 修复：canvas 尺寸不能跟随父容器（父容器可能被撑满 1280px）
+        // 固定为配置的看板娘尺寸（280x250），否则模型位置全乱
+        var fixedW = 280, fixedH = 250;
+        canvas.width = fixedW;
+        canvas.height = fixedH;
+        canvas.style.width = fixedW + 'px';
+        canvas.style.height = fixedH + 'px';
+
         this.app = new PIXI.Application({
             view: canvas,
-            width: w,
-            height: h,
+            width: fixedW,
+            height: fixedH,
             backgroundAlpha: 0,
             antialias: true,
-            resolution: global.devicePixelRatio || 1,
-            autoDensity: true
+            resolution: 1,          // ★ 固定 1，避免 devicePixelRatio 干扰
+            autoDensity: false,     // ★ 关闭自动密度
+            autoStart: true,
+            sharedTicker: false
         });
+
+        // ★ 2026-10-29 修复：确保渲染循环真的在跑
+        // 原代码 tickerFn 只被 remove 从未 add，导致模型从不渲染
+        var selfApp = this;
+        this.tickerFn = function() {
+            if (selfApp.model && selfApp.model.update) {
+                try { selfApp.model.update(selfApp.app.ticker.deltaMS / 1000); } catch(e) {}
+            }
+        };
+        this.app.ticker.add(this.tickerFn);
+        if (!this.app.ticker.started) this.app.ticker.start();
+        console.log('[PioEngine] render ticker started, canvas=' + fixedW + 'x' + fixedH);
     };
 
     Engine.prototype.loadModel = async function(modelPath) {
@@ -344,7 +366,11 @@
             '<div id="pio-loading-pct" style="margin-top:5px;font-size:11px;opacity:.75">0%</div>'
         ].join('');
 
-        canvas.parentElement.style.position = 'relative';
+        // ★ 2026-10-29 修复：不要覆盖容器的 position！
+        // pio.css 里 .pio-container 是 position: fixed + right: 0，
+        // 一旦改成 relative，整个容器会掉到页面左下角。
+        // 容器是 fixed，可以给 absolute 子元素做定位基准，直接用 absolute 即可。
+        wrap.style.position = 'absolute';
         canvas.parentElement.appendChild(wrap);
         console.log('[PioEngine] loading UI shown');
     };
