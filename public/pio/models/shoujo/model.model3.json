@@ -1,0 +1,181 @@
+{
+    "Version": 3,
+    "FileReferences": {
+        "Moc": "model.moc3",
+        "Textures": [
+            "textures/texture_00.png",
+            "textures/texture_01.png"
+        ],
+        "Physics": "model.physics3.json",
+        "DisplayInfo": "model.cdi3.json",
+        "Expressions": [
+            {
+                "Name": "A",
+                "File": "A.exp3.json"
+            },
+            {
+                "Name": "B",
+                "File": "B.exp3.json"
+            },
+            {
+                "Name": "D",
+                "File": "D.exp3.json"
+            },
+            {
+                "Name": "E",
+                "File": "E.exp3.json"
+            },
+            {
+                "Name": "F",
+                "File": "F.exp3.json"
+            },
+            {
+                "Name": "M",
+                "File": "M.exp3.json"
+            },
+            {
+                "Name": "Q",
+                "File": "Q.exp3.json"
+            },
+            {
+                "Name": "R",
+                "File": "R.exp3.json"
+            },
+            {
+                "Name": "S",
+                "File": "S.exp3.json"
+            },
+            {
+                "Name": "W",
+                "File": "W.exp3.json"
+            },
+            {
+                "Name": "angry",
+                "File": "angry.exp3.json"
+            },
+            {
+                "Name": "awkward",
+                "File": "awkward.exp3.json"
+            },
+            {
+                "Name": "battle_damage",
+                "File": "battle_damage.exp3.json"
+            },
+            {
+                "Name": "blush",
+                "File": "blush.exp3.json"
+            },
+            {
+                "Name": "cat_ear_left",
+                "File": "cat_ear_left.exp3.json"
+            },
+            {
+                "Name": "cat_ear_right",
+                "File": "cat_ear_right.exp3.json"
+            },
+            {
+                "Name": "cat_ears_down",
+                "File": "cat_ears_down.exp3.json"
+            },
+            {
+                "Name": "cat_form",
+                "File": "cat_form.exp3.json"
+            },
+            {
+                "Name": "cry",
+                "File": "cry.exp3.json"
+            },
+            {
+                "Name": "dizzy",
+                "File": "dizzy.exp3.json"
+            },
+            {
+                "Name": "heart_eyes",
+                "File": "heart_eyes.exp3.json"
+            },
+            {
+                "Name": "heart_hands",
+                "File": "heart_hands.exp3.json"
+            },
+            {
+                "Name": "hug",
+                "File": "hug.exp3.json"
+            },
+            {
+                "Name": "mouse_left",
+                "File": "mouse_left.exp3.json"
+            },
+            {
+                "Name": "mouse_right",
+                "File": "mouse_right.exp3.json"
+            },
+            {
+                "Name": "open_eyes",
+                "File": "open_eyes.exp3.json"
+            },
+            {
+                "Name": "peace",
+                "File": "peace.exp3.json"
+            },
+            {
+                "Name": "sing_guitar",
+                "File": "sing_guitar.exp3.json"
+            },
+            {
+                "Name": "sing_mic",
+                "File": "sing_mic.exp3.json"
+            },
+            {
+                "Name": "sleep",
+                "File": "sleep.exp3.json"
+            },
+            {
+                "Name": "space",
+                "File": "space.exp3.json"
+            },
+            {
+                "Name": "squint",
+                "File": "squint.exp3.json"
+            },
+            {
+                "Name": "squint_smile",
+                "File": "squint_smile.exp3.json"
+            },
+            {
+                "Name": "standing_form",
+                "File": "standing_form.exp3.json"
+            },
+            {
+                "Name": "star_eyes",
+                "File": "star_eyes.exp3.json"
+            },
+            {
+                "Name": "sunglasses",
+                "File": "sunglasses.exp3.json"
+            },
+            {
+                "Name": "surprised",
+                "File": "surprised.exp3.json"
+            },
+            {
+                "Name": "wink",
+                "File": "wink.exp3.json"
+            }
+        ]
+    },
+    "Groups": [
+        {
+            "Target": "Parameter",
+            "Name": "LipSync",
+            "Ids": []
+        },
+        {
+            "Target": "Parameter",
+            "Name": "EyeBlink",
+            "Ids": [
+                "ParamEyeLOpen",
+                "ParamEyeROpen"
+            ]
+        }
+    ]
+}
