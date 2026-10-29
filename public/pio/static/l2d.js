@@ -153,7 +153,7 @@
 
         // ★ 2026-10-29 修复：canvas 尺寸不能跟随父容器（父容器可能被撑满 1280px）
         // 固定为配置的看板娘尺寸（280x250），否则模型位置全乱
-        var fixedW = 280, fixedH = 250;
+        var fixedW = 220, fixedH = 196;   // ★ 缩小到 78%（原 280x250）
         canvas.width = fixedW;
         canvas.height = fixedH;
         canvas.style.width = fixedW + 'px';
@@ -465,7 +465,7 @@
         // Live2D 模型通常是高>宽的立绘，按高度适配才能完整显示
         var scale;
         if (this.model.height > 1) {
-            scale = (canvasH * 1.0) / this.model.height;   // 高度撑满
+            scale = (canvasH * 0.92) / this.model.height;   // 高度 92%，留边距
         } else if (this.model.width > 1) {
             scale = (canvasW * 0.85) / this.model.width;
         } else {
