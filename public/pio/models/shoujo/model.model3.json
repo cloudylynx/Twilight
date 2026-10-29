@@ -168,6 +168,14 @@
             "Target": "Parameter",
             "Name": "LipSync",
             "Ids": []
+        },
+        {
+            "Target": "Parameter",
+            "Name": "EyeBlink",
+            "Ids": [
+                "ParamEyeLOpen",
+                "ParamEyeROpen"
+            ]
         }
     ]
 }
