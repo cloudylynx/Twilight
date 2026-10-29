@@ -449,10 +449,12 @@ musicPlayer:
 # 看板娘配置
 pio:
     # 启用看板娘
-    enable: false
+    enable: true
     # 模型文件路径
     models:
-        - "/pio/models/furina/model.json"
+        # 愚人众第三席「少女」Live2D 模型（17MB，含 23 个表情）
+        - "/pio/models/shoujo/model.json"
+        # 官方自带 pio 模型（作为备选，随机切换）
         - "/pio/models/pio/model.json"
     # 看板娘位置
     position: "right"
@@ -463,7 +465,7 @@ pio:
     # 展现模式
     mode: "draggable"
     # 是否在移动设备上隐藏
-    hiddenOnMobile: true
+    hiddenOnMobile: false
     # 对话框配置
     dialog:
         # 欢迎词
