@@ -165,7 +165,13 @@
     Engine.prototype.loadModel = async function(modelPath) {
         var self = this;
 
+        // ★ 2026-10-29 新增：加载中提示 + 进度条
+        // 模型文件较大（moc3 5MB + 贴图 11MB），慢网下需要几十秒，
+        // 没有提示用户会以为坏了。
+        self._showLoadingUI();
+
         await loadDependencies();
+        self._updateProgress(30);   // 依赖加载完成
 
         // Clean up any previous model
         this.destroy();
@@ -218,6 +224,8 @@
             actualModelPath = modelPath;
         }
 
+        self._updateProgress(45);   // 配置解析完成
+
         this.modelConfig = {
             motionMap: motionMap,
             layout: layout,
@@ -228,9 +236,23 @@
         // Load the Live2D model via pixi-live2d-display
         var Live2DModel = PIXI.live2d.Live2DModel;
 
-        this.model = await Live2DModel.from(actualModelPath, {
-            autoInteract: false
-        });
+        // ★ 加载模型本体（大文件），用模拟进度让用户知道在动
+        self._updateProgress(50);
+        var fakePct = 50;
+        var fakeTimer = setInterval(function() {
+            // 每 500ms 涨一点，最多到 92%，等真实完成再跳到 100%
+            fakePct = Math.min(92, fakePct + Math.random() * 4);
+            self._updateProgress(fakePct);
+        }, 500);
+
+        try {
+            this.model = await Live2DModel.from(actualModelPath, {
+                autoInteract: false
+            });
+        } finally {
+            clearInterval(fakeTimer);
+        }
+        self._updateProgress(95);
 
         // Position and scale
         this._positionModel();
@@ -278,6 +300,9 @@
             }
         }, 800);
 
+        // ★ 隐藏加载提示
+        self._hideLoadingUI();
+
         // Setup interaction
         this._setupInteraction();
 
@@ -289,6 +314,57 @@
         setTimeout(function() {
             self._playMotionGroup("idle");
         }, 500);
+    };
+
+    // ★ 2026-10-29 新增：加载提示 UI
+    Engine.prototype._showLoadingUI = function() {
+        var self = this;
+        var canvas = this.canvas;
+        if (!canvas || !canvas.parentElement) return;
+
+        // 避免重复创建
+        if (document.getElementById('pio-loading')) return;
+
+        var wrap = document.createElement('div');
+        wrap.id = 'pio-loading';
+        wrap.style.cssText = [
+            'position:absolute', 'left:0', 'top:0', 'right:0', 'bottom:0',
+            'display:flex', 'flex-direction:column',
+            'align-items:center', 'justify-content:center',
+            'background:rgba(0,0,0,.55)', 'border-radius:8px',
+            'color:#fff', 'font-size:12px', 'z-index:10',
+            'pointer-events:none', 'backdrop-filter:blur(2px)'
+        ].join(';');
+
+        wrap.innerHTML = [
+            '<div style="margin-bottom:6px;font-size:11px;opacity:.85">看板娘加载中</div>',
+            '<div style="width:70%;height:4px;background:rgba(255,255,255,.2);border-radius:2px;overflow:hidden">',
+            '  <div id="pio-loading-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#8b5cf6,#ec4899);transition:width .3s"></div>',
+            '</div>',
+            '<div id="pio-loading-pct" style="margin-top:5px;font-size:11px;opacity:.75">0%</div>'
+        ].join('');
+
+        canvas.parentElement.style.position = 'relative';
+        canvas.parentElement.appendChild(wrap);
+        console.log('[PioEngine] loading UI shown');
+    };
+
+    Engine.prototype._updateProgress = function(pct) {
+        var bar = document.getElementById('pio-loading-bar');
+        var label = document.getElementById('pio-loading-pct');
+        var p = Math.max(0, Math.min(100, Math.round(pct)));
+        if (bar) bar.style.width = p + '%';
+        if (label) label.textContent = p + '%';
+    };
+
+    Engine.prototype._hideLoadingUI = function() {
+        var wrap = document.getElementById('pio-loading');
+        if (wrap) {
+            wrap.style.opacity = '0';
+            wrap.style.transition = 'opacity .3s';
+            setTimeout(function() { wrap.remove(); }, 350);
+            console.log('[PioEngine] loading UI hidden');
+        }
     };
 
     Engine.prototype._positionModel = function() {
