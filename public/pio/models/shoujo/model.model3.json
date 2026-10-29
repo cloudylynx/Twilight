@@ -142,10 +142,6 @@
                 "File": "squint_smile.exp3.json"
             },
             {
-                "Name": "standing_form",
-                "File": "standing_form.exp3.json"
-            },
-            {
                 "Name": "star_eyes",
                 "File": "star_eyes.exp3.json"
             },
@@ -160,6 +156,10 @@
             {
                 "Name": "wink",
                 "File": "wink.exp3.json"
+            },
+            {
+                "Name": "standing_pose",
+                "File": "standing_pose.exp3.json"
             }
         ]
     },
