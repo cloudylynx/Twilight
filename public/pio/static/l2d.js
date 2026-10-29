@@ -153,7 +153,12 @@
 
         // ★ 2026-10-29 修复：canvas 尺寸不能跟随父容器（父容器可能被撑满 1280px）
         // 固定为配置的看板娘尺寸（280x250），否则模型位置全乱
-        var fixedW = 280, fixedH = 250;
+        // ★ 2026-10-30 响应式：桌面 280×250，手机(≤500px) 210×188（75%）
+        // 上次只缩 canvas 没缩内部偏移，模型坠出屏幕——这次 canvas/偏移按比例一起缩。
+        var isNarrow = (typeof window !== 'undefined') && window.innerWidth <= 500;
+        var SCALE = isNarrow ? 0.75 : 1.0;
+        var fixedW = Math.round(280 * SCALE);   // 280 / 210
+        var fixedH = Math.round(250 * SCALE);   // 250 / 188
         canvas.width = fixedW;
         canvas.height = fixedH;
         canvas.style.width = fixedW + 'px';
@@ -465,7 +470,7 @@
         // Live2D 模型通常是高>宽的立绘，按高度适配才能完整显示
         var scale;
         if (this.model.height > 1) {
-            scale = (canvasH * 1.0) / this.model.height;   // 高度撑满
+            scale = (canvasH * 1.0) / this.model.height;   // 高度撑满（canvas 已按设备缩放）
         } else if (this.model.width > 1) {
             scale = (canvasW * 0.85) / this.model.width;
         } else {
