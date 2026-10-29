@@ -12,11 +12,11 @@
     // CDN URLs for dependencies
     // ============================================================
     var CDN = {
-        PIXI: "https://cdn.jsdelivr.net/npm/pixi.js@6.5.10/dist/browser/pixi.min.js",
-        CUBISM_CORE: "https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js",
+        PIXI: "/pio/static/vendor/pixi.min.js",
+        CUBISM_CORE: "/pio/static/vendor/live2dcubismcore.min.js",
         CUBISM_CORE_FALLBACK: "/pio/static/live2dcubismcore.min.js",
-        CUBISM2_CORE: "https://cdn.jsdelivr.net/gh/dylanNew/live2d/webgl/Live2D/lib/live2d.min.js",
-        LIVE2D_DISPLAY: "https://cdn.jsdelivr.net/npm/pixi-live2d-display@0.4.0/dist/index.min.js"
+        CUBISM2_CORE: "/pio/static/vendor/live2d.min.js",
+        LIVE2D_DISPLAY: "/pio/static/vendor/pixi-live2d-display.min.js"
     };
 
     // ============================================================
@@ -64,18 +64,19 @@
                 }
             }
 
-            if (!global.PIXI || !global.PIXI.live2d) {
-                await loadScript(CDN.LIVE2D_DISPLAY);
-            }
-
-            // Load Cubism 2.1 core for backward compatibility with older .moc models
-            // Only if not already loaded by old l2d.js
-            if (!global.Live2DModelWeb) {
+            // ★ 2026-10-29 修复：Cubism 2 core 必须在 pixi-live2d-display 之前加载
+            // 否则 pixi-live2d-display 初始化时会报 "Live2DMotion is not defined"，
+            // 导致 PIXI.live2d 挂载失败，后续 Live2DModel.from() 报 undefined。
+            if (!global.Live2DModelWeb && CDN.CUBISM2_CORE) {
                 try {
                     await loadScript(CDN.CUBISM2_CORE);
                 } catch (e) {
                     console.warn("[PioEngine] Cubism 2.1 core not available, .moc models won't work");
                 }
+            }
+
+            if (!global.PIXI || !global.PIXI.live2d) {
+                await loadScript(CDN.LIVE2D_DISPLAY);
             }
 
             depsLoaded = true;
@@ -180,8 +181,9 @@
         var motionMap = {};
         var layout = { center_x: 0, center_y: -0.12, width: 1.6 };
 
+        var config = null;   // ★ 2026-10-29：提前声明，供后续读 defaultExpression
         try {
-            var config = await fetchJSON(modelPath);
+            config = await fetchJSON(modelPath);
 
             if (config.model3) {
                 // Our custom config pointing to a Cubism 3 model
@@ -218,7 +220,9 @@
 
         this.modelConfig = {
             motionMap: motionMap,
-            layout: layout
+            layout: layout,
+            // ★ 2026-10-29：把 model.json 的 defaultExpression 传进来
+            defaultExpression: (config && config.defaultExpression) || null
         };
 
         // Load the Live2D model via pixi-live2d-display
@@ -233,6 +237,46 @@
 
         // Add to stage
         this.app.stage.addChild(this.model);
+
+        // ★ 2026-10-29 诊断：打印 model 和 stage 的实际状态
+        try {
+            console.log('[PioEngine][DIAG] ' + JSON.stringify({
+                modelType: this.model.constructor.name,
+                visible: this.model.visible,
+                alpha: this.model.alpha,
+                x: this.model.x, y: this.model.y,
+                scale: {x: this.model.scale.x, y: this.model.scale.y},
+                width: this.model.width, height: this.model.height,
+                internalModel: this.model.internalModel ? this.model.internalModel.constructor.name : null,
+                coreModel: this.model.internalModel && this.model.internalModel.coreModel
+                    ? this.model.internalModel.coreModel.constructor.name : null,
+                stageChildren: this.app.stage.children.length,
+                rendererSize: this.app.renderer.width + 'x' + this.app.renderer.height,
+                tickerStarted: this.app.ticker.started,
+                autoUpdate: this.model.autoUpdate
+            }));
+        } catch (e) { console.warn('[PioEngine][DIAG] error', e); }
+
+        // ★ 2026-10-29 新增：应用默认表情（切换形态）
+        // 少女VTS模型默认是「猫猫形态」（桌宠键盘猫姿势），
+        // 通过 expression('standing_form') 切换到站立形态。
+        var selfExpr = this;
+        setTimeout(function() {
+            try {
+                var mc = selfExpr.modelConfig;
+                var defExpr = mc && mc.defaultExpression;
+                console.log('[PioEngine][EXPR] check: modelConfig=' + !!mc +
+                            ' defaultExpression=' + defExpr +
+                            ' model=' + !!selfExpr.model +
+                            ' hasFn=' + (selfExpr.model && typeof selfExpr.model.expression === 'function'));
+                if (defExpr && selfExpr.model && typeof selfExpr.model.expression === 'function') {
+                    var ret = selfExpr.model.expression(defExpr);
+                    console.log('[PioEngine][EXPR] applied "' + defExpr + '" ret=' + ret);
+                }
+            } catch (e) {
+                console.warn('[PioEngine][EXPR] failed: ' + e.message + ' | stack=' + (e.stack||'').substring(0,200));
+            }
+        }, 800);
 
         // Setup interaction
         this._setupInteraction();
@@ -260,22 +304,57 @@
         this.model.y = canvasH / 2;
 
         // Determine model dimensions (may need a frame to be available)
-        var modelW = this.model.internalModel
-            ? this.model.internalModel.getCanvasWidth()
-            : 0;
-
-        if (modelW > 0) {
-            var scale = (canvasW * 0.55) / modelW;
-            this.model.scale.set(scale);
-
-            var cy = layout.center_y !== undefined ? layout.center_y : -0.12;
-            this.model.y = canvasH / 2 + cy * canvasH;
-        } else {
-            // Fallback: use a default scale
-            this.model.scale.set(0.15);
-            var cy2 = layout.center_y !== undefined ? layout.center_y : -0.12;
-            this.model.y = canvasH / 2 + cy2 * canvasH;
+        // ★ 2026-10-29 修复：getCanvasWidth 是 Cubism 2 的 API，
+        // Cubism 3/4 用 coreModel.getCanvasWidth() 或 width 属性。
+        // 这里做多级兜底，避免 TypeError 中断加载。
+        var modelW = 0;
+        try {
+            var im = this.model.internalModel;
+            if (im) {
+                if (typeof im.getCanvasWidth === 'function') {
+                    modelW = im.getCanvasWidth();
+                } else if (im.coreModel && typeof im.coreModel.getCanvasWidth === 'function') {
+                    modelW = im.coreModel.getCanvasWidth();
+                } else if (typeof im.width === 'number' && im.width > 0) {
+                    modelW = im.width;
+                } else if (im.coreModel && typeof im.coreModel.getModel === 'function') {
+                    var cm = im.coreModel.getModel();
+                    if (cm && typeof cm.getCanvasWidth === 'function') {
+                        modelW = cm.getCanvasWidth();
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn('[PioEngine] getCanvasWidth unavailable, using fallback scale', e);
+            modelW = 0;
         }
+
+        // ★ 2026-10-29 修复：原实现用 getCanvasWidth() 得到的值算 scale，
+        // 但 Cubism 3/4 的 canvas 宽可能是 1（无效值），导致 scale 被放大到 154 倍，
+        // 模型尺寸变成 246400px，完全跑到画布外。
+        // 改用 model.width（PIXI 实际测量值）反推，并限制 scale 范围。
+        // ★ 用 model.height（PIXI 实测高度）适配 canvas 高度
+        // Live2D 模型通常是高>宽的立绘，按高度适配才能完整显示
+        var scale;
+        if (this.model.height > 1) {
+            scale = (canvasH * 1.0) / this.model.height;   // 高度撑满
+        } else if (this.model.width > 1) {
+            scale = (canvasW * 0.85) / this.model.width;
+        } else {
+            scale = 0.15;
+        }
+        if (!isFinite(scale) || scale <= 0) scale = 0.15;
+        scale = Math.max(0.01, Math.min(scale, 10));
+
+        this.model.scale.set(scale);
+
+        // 居中（y 方向用 0 偏移，让模型垂直居中而不是偏上）
+        this.model.x = canvasW / 2;
+        this.model.y = canvasH / 2;
+
+        console.log('[PioEngine][DIAG] scale=' + scale.toFixed(3) +
+                    ' model=' + this.model.width.toFixed(0) + 'x' + this.model.height.toFixed(0) +
+                    ' pos=' + this.model.x.toFixed(0) + ',' + this.model.y.toFixed(0));
     };
 
     Engine.prototype._setupInteraction = function() {
