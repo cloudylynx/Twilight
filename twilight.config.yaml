@@ -469,13 +469,12 @@ pio:
     # 对话框配置
     dialog:
         # 欢迎词
-        welcome: "Welcome!"
+        welcome: "欢迎来到挪德卡莱"
         # 触摸提示
         touch:
-            - "What are you doing?"
-            - "Stop touching me!"
-            - "Don't bully me like that!"
-            - "(｡í _ ì｡)"
+            - "要我借你一束月光吗？"
+            - "三月交辉之刻"
+            - "嗯…"
         # 首页提示
         home: "Click here to go back to homepage!"
         # 换装提示
